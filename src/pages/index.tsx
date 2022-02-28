@@ -88,23 +88,38 @@ export default function Home() {
 
       <Flex as='section' p={4} w='100%' alignItems='center' flexDir='column'>
         <Flex w='100%' justifyContent='center'>
-          <Flex p={2} m={2}>
-            <Image height='100' width='100' src='/logo.png' alt='pkg.js' />
+          <Flex flex={1}></Flex>
+
+          <Flex flex={1} p={2} m={2} justifyContent='center'>
+            <Image
+              height='100'
+              width='100'
+              objectFit='contain'
+              src='/logo.png'
+              alt='pkg.js'
+            />
             <Flex m={3} flexDir='column' justifyContent='center'>
               <Heading>pkg.js</Heading>
             </Flex>
           </Flex>
 
-          <Flex alignItems='center'>
-            <DarkModeBtn />
+          <Flex flex={1} mx={5} alignItems='center' justifyContent='flex-end'>
+            <DarkModeBtn h='50%' />
           </Flex>
         </Flex>
+
         <InputGroup w={['100%', '80%', '50%']}>
+          <label htmlFor='package'></label>
           <InputLeftElement pointerEvents='none'>
             {<Search2Icon />}
           </InputLeftElement>
-          <Input onChange={onChange} />
+          <Input
+            id='package'
+            onChange={onChange}
+            placeholder='Enter a package name'
+          />
         </InputGroup>
+
         {typeahead && subject$?.value.length >= MINIMUM_QUERY_LENGTH && (
           <InfiniteLoadResults
             w={['100%', '80%', '50%']}

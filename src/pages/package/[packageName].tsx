@@ -10,19 +10,23 @@ import {
   Tab,
   TabPanel,
   Text,
+  Divider,
+  Icon,
 } from '@chakra-ui/react';
 import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
   NextPage,
 } from 'next';
-import Head from 'next/head';
 import { pkgService } from 'src/services/pkg.service';
 import { PackageDetails } from 'src/types/entities';
 import ReactMarkdown from 'react-markdown';
 import { WithTopBar } from 'src/components/Layout';
 import { componentsMapper } from 'src/types/constants';
-import { DownloadsChart } from 'src/components/DownloadsChart';
+import { PackageMetadata } from 'src/components/PackageMeta';
+import Link from 'next/link';
+import { AiFillGithub } from 'react-icons/ai';
+import { BsGlobe } from 'react-icons/bs';
 
 interface PackagePageProps {
   pkg: PackageDetails;
@@ -30,73 +34,92 @@ interface PackagePageProps {
 
 const PackagePage: NextPage<PackagePageProps> = ({ pkg }) => {
   return (
-    <WithTopBar>
-      <Head>
-        <title>{pkg._id.concat(' - Pkg.js')}</title>
-        <meta
-          property='description'
-          content={pkg.description.concat(
-            ` Latest version: ${pkg['dist-tags'].latest || ''}`
-          )}
-        />
-        <meta
-          name='og:description'
-          content={pkg.description.concat(
-            ` Latest version: ${pkg['dist-tags'].latest || ''}`
-          )}
-        />
-        <meta name='og:title' content={pkg._id.concat(' - Pkg.js')} />
-        <meta name='og:site_name' content={'pkg.js'} />
-        {pkg.keywords && (
-          <meta name='keywords' content={pkg.keywords.join(',')} />
-        )}
-        <meta name='twitter:card' content='summary' />
-        <meta
-          name='twitter:description'
-          content={pkg.description.concat(
-            ` Latest version: ${pkg['dist-tags'].latest || ''}`
-          )}
-        />
-        <meta name='twitter:title' content={`pkg.js: ${pkg.name}`} />
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
+    <>
+      <PackageMetadata pkg={pkg} />
+      <WithTopBar>
+        <Flex as='section' alignItems='center' flexDir='column' p={2}>
+          <Flex as='article' flexDir='column' w={['100%', '80%', '80%', '65%']}>
+            <Stack direction='row'>
+              <Heading>{pkg.name || pkg._id}</Heading>
+              <Flex alignItems='center'>
+                <Badge height='50%' colorScheme='green'>
+                  {pkg['dist-tags'].latest}
+                </Badge>
+              </Flex>
+            </Stack>
 
-      <Flex as='section' alignItems='center' flexDir='column' p={2}>
-        <Flex as='article' flexDir='column' w={['100%', '80%', '80%', '65%']}>
-          <Stack direction='row'>
-            <Heading>{pkg.name || pkg._id}</Heading>
-            <Flex alignItems='center'>
-              <Badge height='50%' colorScheme='green'>
-                {pkg['dist-tags'].latest}
-              </Badge>
-            </Flex>
-          </Stack>
+            <Text m={3}>{pkg.description}</Text>
 
-          <Text m={3}>{pkg.description}</Text>
+            <Tabs size='md' variant='enclosed'>
+              <TabList>
+                {pkg.readme && <Tab>README.md</Tab>}
+                <Tab>Summary</Tab>
+              </TabList>
 
-          <Tabs size='md' variant='enclosed'>
-            <TabList>
-              {pkg.readme && <Tab>README.md</Tab>}
-              <Tab>Summary</Tab>
-            </TabList>
+              <TabPanels>
+                {pkg.readme && (
+                  <TabPanel>
+                    <ReactMarkdown components={componentsMapper}>
+                      {pkg.readme}
+                    </ReactMarkdown>
+                  </TabPanel>
+                )}
 
-            <TabPanels>
-              {pkg.readme && (
                 <TabPanel>
-                  <ReactMarkdown components={componentsMapper}>
-                    {pkg.readme}
-                  </ReactMarkdown>
-                </TabPanel>
-              )}
+                  <Heading as='h2' m={4}>
+                    Summary
+                  </Heading>
 
-              <TabPanel>
-                <Heading as='h2' m={4}></Heading>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+                  {pkg.repository?.url && (
+                    <Flex m={2}>
+                      <Flex flexDir='column' justifyContent='center'>
+                        <Icon as={AiFillGithub} />
+                      </Flex>
+
+                      <Link
+                        href={pkg.repository.url.replace(/git\+/, '')}
+                        passHref
+                      >
+                        <Text m={2} textDecor='underline' cursor='pointer'>
+                          Source code
+                        </Text>
+                      </Link>
+                    </Flex>
+                  )}
+
+                  {pkg.homepage && (
+                    <Flex m={2}>
+                      <Flex flexDir='column' justifyContent='center'>
+                        <Icon as={BsGlobe} />
+                      </Flex>
+
+                      <Link href={pkg.homepage} passHref>
+                        <Text m={2} textDecor='underline' cursor='pointer'>
+                          Homepage
+                        </Text>
+                      </Link>
+                    </Flex>
+                  )}
+
+                  <Divider borderWidth={2} />
+
+                  <Heading as='h2' m={4}>
+                    Keywords
+                  </Heading>
+
+                  {pkg.keywords &&
+                    pkg.keywords.map((keyword) => (
+                      <Badge m={1} key={keyword}>
+                        {keyword}
+                      </Badge>
+                    ))}
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Flex>
         </Flex>
-      </Flex>
-    </WithTopBar>
+      </WithTopBar>
+    </>
   );
 };
 

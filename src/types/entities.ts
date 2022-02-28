@@ -52,7 +52,7 @@ export interface PackageDetails {
   _id: string;
   _rev: string;
   name: string;
-  description: string;
+  description?: string;
   ['dist-tags']: {
     latest: string;
     next: string;
@@ -68,7 +68,7 @@ export interface PackageDetails {
   readme: string;
   readmeFilename: string;
   homepage: string;
-  keywords: Array<string>;
+  keywords?: Array<string>;
   bugs: {
     url: string;
   };
